@@ -1,4 +1,12 @@
 pub mod custom;
+mod r#enum;
+mod error;
+pub mod json;
+mod map;
+mod sequence;
+mod visitor;
+
+pub use self::{error::*, map::*, r#enum::*, sequence::*, visitor::*};
 
 pub trait Deserialize: Sized {
     type Error;
@@ -11,7 +19,56 @@ pub trait Deserialize: Sized {
 }
 
 pub trait Deserializer: Sized {
-    type Error;
+    type Error: DeserializationError;
+
+    fn deserialize_bool<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_i8<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_i16<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_i32<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_i64<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_u8<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_u16<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
 
     fn deserialize_u32<VisitorT>(
         self,
@@ -27,28 +84,133 @@ pub trait Deserializer: Sized {
     where
         VisitorT: Visitor;
 
-    fn deserialize_u32_and_u64<VisitorT>(
+    fn deserialize_f32<VisitorT>(
         self,
         visitor: VisitorT,
     ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
     where
         VisitorT: Visitor;
-}
 
-pub trait Visitor: Sized {
-    type Error;
+    fn deserialize_f64<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
 
-    type Value;
+    fn deserialize_char<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
 
-    fn visit_u32(self, v: u32) -> Result<Self::Value, Self::Error>;
-    fn visit_u64(self, v: u64) -> Result<Self::Value, Self::Error>;
-    fn visit_u32_and_u64(self, v: u32, v2: u64) -> Result<Self::Value, Self::Error> {
-        if v == v2 as u32 {
-            self.visit_u32(v)
-        } else {
-            self.visit_u64(v2)
-        }
-    }
+    fn deserialize_str<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_string<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_bytes<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_byte_buf<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_option<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_unit<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_unit_struct<VisitorT>(
+        self,
+        name: &'static str,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_newtype_struct<VisitorT>(
+        self,
+        name: &'static str,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_sequence<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_tuple<VisitorT>(
+        self,
+        length: usize,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_tuple_struct<VisitorT>(
+        self,
+        name: &'static str,
+        length: usize,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_map<VisitorT>(
+        self,
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_struct<VisitorT>(
+        self,
+        name: &'static str,
+        fields: &'static [&'static str],
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
+
+    fn deserialize_enum<VisitorT>(
+        self,
+        name: &'static str,
+        variants: &'static [&'static str],
+        visitor: VisitorT,
+    ) -> Result<VisitorT::Value, Error<Self::Error, VisitorT::Error>>
+    where
+        VisitorT: Visitor;
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -66,189 +228,5 @@ impl<DeserializerErrorT, VisitorErrorT> Error<DeserializerErrorT, VisitorErrorT>
             Error::Deserializer(e) => Error::Deserializer(e),
             Error::Visitor(e) => Error::Visitor(e.into()),
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test() {
-        #[derive(Debug)]
-        struct LimitedU32(u32);
-
-        #[derive(Debug, PartialEq, Eq)]
-        enum LimitedU32Error {
-            TooLarge,
-        }
-
-        struct LimitedU32Visitor;
-
-        impl Visitor for LimitedU32Visitor {
-            type Error = LimitedU32Error;
-
-            type Value = LimitedU32;
-
-            fn visit_u32(self, v: u32) -> Result<Self::Value, Self::Error> {
-                if v > 100 {
-                    Err(LimitedU32Error::TooLarge)
-                } else {
-                    Ok(LimitedU32(v))
-                }
-            }
-
-            fn visit_u64(self, v: u64) -> Result<Self::Value, Self::Error> {
-                if v > 100 {
-                    Err(LimitedU32Error::TooLarge)
-                } else {
-                    Ok(LimitedU32(v as u32))
-                }
-            }
-        }
-
-        impl Deserialize for LimitedU32 {
-            type Error = LimitedU32Error;
-
-            fn deserialize<DeserializerT>(
-                deserializer: DeserializerT,
-            ) -> Result<Self, Error<DeserializerT::Error, Self::Error>>
-            where
-                DeserializerT: Deserializer,
-            {
-                deserializer.deserialize_u32(LimitedU32Visitor)
-            }
-        }
-
-        #[derive(Debug)]
-        struct LimitedU64(u64);
-
-        #[derive(Debug, PartialEq, Eq)]
-        enum LimitedU64Error {
-            TooLarge,
-        }
-
-        struct LimitedU64Visitor;
-
-        impl Visitor for LimitedU64Visitor {
-            type Error = LimitedU64Error;
-
-            type Value = LimitedU64;
-
-            fn visit_u32(self, v: u32) -> Result<Self::Value, Self::Error> {
-                if v > 100 {
-                    Err(LimitedU64Error::TooLarge)
-                } else {
-                    Ok(LimitedU64(v as u64))
-                }
-            }
-
-            fn visit_u64(self, v: u64) -> Result<Self::Value, Self::Error> {
-                if v > 100 {
-                    Err(LimitedU64Error::TooLarge)
-                } else {
-                    Ok(LimitedU64(v))
-                }
-            }
-        }
-
-        impl Deserialize for LimitedU64 {
-            type Error = LimitedU64Error;
-
-            fn deserialize<DeserializerT>(
-                deserializer: DeserializerT,
-            ) -> Result<Self, Error<DeserializerT::Error, Self::Error>>
-            where
-                DeserializerT: Deserializer,
-            {
-                deserializer.deserialize_u32(LimitedU64Visitor)
-            }
-        }
-
-        #[derive(Debug, PartialEq, Eq)]
-        enum FooError {
-            LimitedU32Error(LimitedU32Error),
-            LimitedU64Error(LimitedU64Error),
-            InvalidInput,
-        }
-
-        impl From<LimitedU32Error> for FooError {
-            fn from(e: LimitedU32Error) -> Self {
-                FooError::LimitedU32Error(e)
-            }
-        }
-
-        impl From<LimitedU64Error> for FooError {
-            fn from(e: LimitedU64Error) -> Self {
-                FooError::LimitedU64Error(e)
-            }
-        }
-
-        impl<DeserializerErrorT> From<FooError> for Error<DeserializerErrorT, FooError> {
-            fn from(e: FooError) -> Self {
-                Error::Visitor(e)
-            }
-        }
-
-        #[derive(Debug)]
-        struct Foo {
-            a: LimitedU32,
-            b: LimitedU64,
-        }
-
-        impl Deserialize for Foo {
-            type Error = FooError;
-
-            fn deserialize<DeserializerT>(
-                deserializer: DeserializerT,
-            ) -> Result<Self, Error<DeserializerT::Error, Self::Error>>
-            where
-                DeserializerT: Deserializer,
-            {
-                struct FooVisitor;
-
-                impl Visitor for FooVisitor {
-                    type Error = FooError;
-
-                    type Value = Foo;
-
-                    fn visit_u32(self, _v: u32) -> Result<Self::Value, Self::Error> {
-                        Err(FooError::InvalidInput)
-                    }
-
-                    fn visit_u64(self, _v: u64) -> Result<Self::Value, Self::Error> {
-                        Err(FooError::InvalidInput)
-                    }
-
-                    fn visit_u32_and_u64(
-                        self,
-                        v: u32,
-                        v2: u64,
-                    ) -> Result<Self::Value, Self::Error> {
-                        Ok(Foo {
-                            a: LimitedU32Visitor.visit_u32(v)?,
-                            b: LimitedU64Visitor.visit_u64(v2)?,
-                        })
-                    }
-                }
-
-                deserializer.deserialize_u32_and_u64(FooVisitor)
-            }
-        }
-
-        let mut deserializer = custom::CustomDeserializer::new("97 456");
-        let error =
-            Foo::deserialize(&mut deserializer).expect_err("Should fail with visitor error");
-
-        assert_eq!(
-            error,
-            Error::Visitor(FooError::LimitedU64Error(LimitedU64Error::TooLarge))
-        );
-
-        let mut deserializer = custom::CustomDeserializer::new("97 68");
-        let foo = Foo::deserialize(&mut deserializer).expect("Should succeed");
-
-        assert_eq!(foo.a.0, 97);
-        assert_eq!(foo.b.0, 68);
     }
 }

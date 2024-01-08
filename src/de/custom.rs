@@ -1,4 +1,4 @@
-use super::{Deserializer, Error, Visitor};
+use super::{DeserializationError, Deserializer, Error, Expected, Unexpected, Visitor};
 
 pub struct CustomDeserializer<'a> {
     input: &'a str,
@@ -17,6 +17,20 @@ pub enum CustomError {
         error: std::num::ParseIntError,
         input: String,
     },
+}
+
+impl DeserializationError for CustomError {
+    fn invalid_type(actual: Unexpected<'_>, expected: &impl Expected) -> Self {
+        todo!()
+    }
+
+    fn invalid_value(actual: Unexpected<'_>, expected: &impl Expected) -> Self {
+        todo!()
+    }
+
+    fn invalid_length(actual: usize, expected: &impl Expected) -> Self {
+        todo!()
+    }
 }
 
 impl<'a> Deserializer for &'a mut CustomDeserializer<'_> {
